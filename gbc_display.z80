@@ -1,0 +1,21 @@
+; Wait until VBlank
+.notVBlanking
+	ldh a, [rLY] ; Read the LCD's drawing status
+	; NOTE: ldh is a shorter and faster version of ld for addresses in the $FF00-$FFFF range.
+	cp 144
+	jr c, .notVBlanking ; jump if carry to .notVBlanking if it's value is less than 144 (it is not vblanking)
+
+; Also available is address $FF41, the STAT register. More specifically, the lower two bits.
+; Mode 0, HBlank
+; Mode 1, VBlank
+; Mode 2, OAM search
+; Mode 3, Rendering. 
+
+; VRAM - memory between $8000 and $9FFF.
+; Accessing VRAM is delicate.
+; Only can really be accessed while LCD is turned off, and the PPU (pixel processing unit) is effectively put into sleep.
+
+; Tiles
+; Tiles have 8x8 pixels. Each pixel can be one of four colors.
+; Game Boy stores tile maps of 32 x 32 tiles between at $9800-$9BFF, and $9C00-$9FFF.
+; SCY and SCX registers ($FF42 and $FF43 respectively), are scroll registers. 

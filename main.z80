@@ -1,0 +1,73 @@
+INCLUDE "hardware.inc"
+
+SECTION "Header", ROM0[$100] ; execution begins at $100, so we put the Header there. 
+EntryPoint: ; This is where execution begins.
+	di ; Disable interrupts. That way we can avoid dealing with them.
+	jp Start ; Leave this tiny space.
+	
+REPT $150 - $104
+	db 0
+ENDR
+
+SECTION "Game code", ROM0
+Start:
+	; Turn of the LCD
+.waitVBlank
+	ld a, [rLY]
+	cp 144 ; check if the LCD is past VBlank
+	jr c, .waitVBlank
+
+	xor a ; ld a, 0
+	ld [rLCDC], a ;
+
+	; Now the LCD is off.
+	ld hl, $9000
+	ld de, FontTiles
+	ld bc, FontTilesEnd - FontTiles
+.copyFont
+	ld a, [de] ; grab 1 byte from the source.
+	ld [hli], a ; place it at the destination, incrementing hl.
+	inc de ; Move to next byte
+	dec bc ; Decrement count
+	ld a, b ; Check if count is 0
+	or c
+	jr nz, .copyFont
+
+	ld hl, $9800 ; This will print the string at the top left corner of the screen
+	ld de, HelloWorldStr
+.copyString
+	ld a, [de]
+	ld [hli], a
+	inc de
+	and a ; Check if the byte we just copied is zero
+	jr nz, .copyString ; Continue if it's not
+
+	; Init display registers
+	ld a, %11100100
+	ld [rBGP], a
+
+	xor a ; ld a, 0
+	ld [rSCY], a
+	ld [rSCX], a
+
+	; Shut sound down
+	ld [rNR52], a
+
+	; Turn screen on, display background
+	ld a, %10000001
+	ld [rLCDC], a
+
+	; Lock up
+.lockup
+	jr .lockup
+
+SECTION "Font", ROM0
+
+FontTiles:
+	INCBIN "font.chr"
+FontTilesEnd:
+
+SECTION "Hello World string", ROM0
+
+HelloWorldStr:
+	db "Hello World!", 0
