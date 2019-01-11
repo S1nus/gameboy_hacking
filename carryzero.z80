@@ -1,0 +1,15 @@
+; Concrete example of Carry flag being used with ADD instuction
+
+	ld a, $EF
+	ld b, $10
+
+	add a, b
+	; A is set equal to $FF, Z = 0, C = 0
+	add a, b
+	; A is set to $0F Z reset, Carry set
+	add a, b
+	; A is set to $1F, Z reset, carry reset
+	add a, $E1
+	; A is set to $00, Z set, carry set
+	add a, 0
+	; A = $00, Z set, C reset 

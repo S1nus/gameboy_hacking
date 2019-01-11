@@ -1,0 +1,31 @@
+; Arithmetics
+; from https://eldred.fr/gb-asm-tutorial/arithmetics.html
+
+; add hl, $1337
+; Node: destroys A 
+
+	ld a, l
+	add a, $37
+	ld l, a
+	ld a, h
+	add a, $13
+	ld h, a
+
+; Doing the same thing, but with adc 
+
+	ld a, c
+	add a, [hl]
+	ld c, a
+	inc hl
+	ld a, b
+	adc a, [hl]
+	ld b, a
+	dec hl
+; This is basically add bc, [hl]
+
+; Subtraction
+
+	ld a, 3
+	ld b, 2
+
+	sub b
